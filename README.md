@@ -39,7 +39,7 @@ import os
    
 path = os.path.join(os.environ['USERPROFILE'])+r'\Desktop\' #set your path
 ```
-* Here you read your clients portfolio, used as the base for the coverage, and the sales per client per product.
+* Here you read your clients portfolio, used as the base for the coverage, and the sales per client per product:
 ```python
 
 client_db = pd.read_csv(os.path.abspath(os.path.join(path,'Input\Cartera.csv')),sep=",",header=0) 
@@ -48,7 +48,7 @@ sales_db = sales_db.pivot(index="Cod Cli",columns="SKU",values="Vol Paq")
 db_bc = pd.merge(client_db,sales_db,how='left',on='Cod Cli')
 ```
 
-* The next step is to create the pivot table of buyers, using de merged database between clients and sales bases.
+* The next step is to create the pivot table of buyers, using the merged database between clients and sales:
 
 ```python
 
@@ -59,7 +59,7 @@ dic_agg['Cod Cli'] = pd.Series.nunique
 pivot = pd.pivot_table(db_bc,index=['Region',"Area","Zona"],aggfunc= dic_agg)
 ```
 
-* Now, we can add subtotals to the Pivot Table and create the coverage value for each SKU.
+* Now, we can add subtotals to the Pivot Table and calculate the coverage for each SKU:
 
 ```python
 
@@ -70,4 +70,44 @@ pivot = pd.concat([
             **{x: 'Total' for x in grouper[i:]}
         ).groupby(grouper).sum() for i in range(len(grouper)+1)
     ]).sort_index()
+for j in PIVOT[skus]:
+    PIVOT['COB - '+j] = PIVOT[j]/PIVOT['activo']   
+```
+
+* Optional Steps:
+```python
+cov = ["COV - " + x for x in skus]
+grouper.append('Cod Cli')
+cov = cov+grouper
+pivot.drop(columns=pivot.columns.difference(cov), inplace=True) 
+pivot = pivot.reset_index()
+pivot.iloc[:,2].replace('',np.nan,inplace=True)
+rows = pivot.iloc[:,2].isna()
+rows =  [i+1 for i, x in enumerate(rows) if x]
+group = pivot.iloc[:,2].notna()
+group =  [i+1 for i, x in enumerate(group) if x]
+cov = [i for i, x in enumerate(pivot.columns.values) if x[:3] == 'COV']
+writer = pd.ExcelWriter(os.path.abspath(os.path.join(path,'COVERAGE.xlsx')),engine='xlsxwriter')
+pivot.to_excel(writer,index=False,sheet_name='Summary', na_rep="")
+wb = writer.book 
+ws = writer.sheets['Summary']
+num = wb.add_format({'num_format': '#,##0','align':'center'})
+porc = wb.add_format({'num_format': '0%','align':'center'})
+header_format = wb.add_format({'align':'center','valign':'top','text_wrap':True, 'bold':True,'bg_color':'#050978','font_color':'white'})
+subtotal_num = wb.add_format({'bold':True,'bg_color':'#8b9dc3','num_format':'#,##0','align':'center','valign':'top'})
+subtotal_porc = wb.add_format({'bold':True,'bg_color':'#8b9dc3','num_format':'0%','align':'center','valign':'top'})
+ws.set_column(4,4,18,num)
+for i in cob:
+    ws.set_column(i,i,18,porc)
+for col_num, value in enumerate(pivot.columns.values):
+    ws.write(0, col_num, value, header_format)
+ws.autofilter(0,0,len(pivot.index),len(pivot.columns)-1)
+for i in rows:
+    for j in range(0,4):
+        ws.write(i-1,j, pivot.iloc[i-2,j],subtotal_num)
+for i in rows:
+    for j in range(4,len(pivot.columns)):
+        ws.write(i-1,j, pivot.iloc[i-2,j],subtotal_porc)
+for i in group:
+   ws.set_row(i, None, None, {'level':1})
 ```
