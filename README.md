@@ -74,7 +74,7 @@ for j in PIVOT[skus]:
     PIVOT['COB - '+j] = PIVOT[j]/PIVOT['activo']   
 ```
 
-* Optional Steps:
+* Optional Steps: Removing buyers and formatting the excel output
 ```python
 cov = ["COV - " + x for x in skus]
 grouper.append('Cod Cli')
@@ -110,4 +110,11 @@ for i in rows:
         ws.write(i-1,j, pivot.iloc[i-2,j],subtotal_porc)
 for i in group:
    ws.set_row(i, None, None, {'level':1})
+   
+writer.save()
+writer.close()
 ```
+* Compile and run the code. It fully run, then the script will export a formatted excel output with the percentual coverage per grouper per sku.
+
+## Contact
+If you want to contact me you can reach me at juanidinaro@gmail.com.
