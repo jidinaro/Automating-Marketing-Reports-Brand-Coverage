@@ -43,6 +43,7 @@ path = os.path.join(os.environ['USERPROFILE'])+r'\Desktop\Python\GitHub'  #set y
 ```python
 
 client_db = pd.read_csv(os.path.abspath(os.path.join(path,'Input\Cartera.csv')),sep=",",header=0) 
+client_db['Cod Cli'] = client_db['Cod Cli'].astype(str)
 sales_db = pd.read_csv(os.path.abspath(os.path.join(path,'Input\Sales.txt')),sep=",",header=0)
 sales_db['Cod Cli'] = sales_db['Cod Cli'].astype(str)
 skus = sales_db.SKU.unique().tolist()
