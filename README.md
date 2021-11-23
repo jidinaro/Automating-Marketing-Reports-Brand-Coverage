@@ -58,11 +58,11 @@ for x in skus: dic_agg[x] = lambda x: (x>0).sum() #This function counts values g
 dic_agg['Cod Cli'] = pd.Series.nunique #This function counts distinct values.
 grouper = ['Region', 'Area', 'Zona'] #Specify your grouper for the pivot table.
 ```
-* The next step is to execute the function `coverage`, in order to create the grouped pivot table per sku and excel formatted. Before executing it, you would have to replace on bc.py the argument 'Cod Cli' (it appears 2 times) with the column name corresponding to your client codes.
+* The last step is to execute the `coverage` function, in order to create the grouped pivot table per sku. Before executing the function, you would have to replace on `bc.py` the argument 'Cod Cli' (it appears 2 times) with the column name corresponding to your client codes.
 ```python
 coverage(path, db_bc, grouper, skus, dic_agg)
 ```
-* Compile and run the code. If fully run, then the script will export to your set path, a formatted excel  with the percentual coverage per grouper per sku.
+* Compile and run the code. If fully run, then the script will export to your specified path, a formatted excel with the percentual coverage per grouper per sku.
 
 ## Contact
 If you want to contact me you can reach me at juanidinaro@gmail.com.
