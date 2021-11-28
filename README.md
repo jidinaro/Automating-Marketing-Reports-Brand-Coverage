@@ -50,7 +50,7 @@ sales_db = sales_db.pivot(index="Cod Cli",columns="SKU",values="Vol Paq") #Check
 db_bc = pd.merge(client_db,sales_db,how='left',on='Cod Cli') #Check the column name corresponding to client codes.
 ```
 
-* The next step is to define the dictionary of agg functions used on the pivot table. This is made since it could be the case where all the columns do not use the same aggfunc.
+* The next step is to define the dictionary of agg functions used on the pivot table. This is donde since it could be the case where all the columns do not use the same aggfunc.
 
 ```python
 dic_agg = {}
